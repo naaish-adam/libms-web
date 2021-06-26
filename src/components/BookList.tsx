@@ -6,7 +6,7 @@ import BookCard from "./BookCard";
 interface BookListProps {}
 
 const BookList: React.FC<BookListProps> = ({}) => {
-  const pageLimit = 2;
+  const pageLimit = 10;
   const [filter, setFilter] = useState<string | undefined>(undefined);
   const { data, loading, fetchMore, refetch } = useBookListQuery({
     variables: { first: pageLimit },
@@ -27,6 +27,13 @@ const BookList: React.FC<BookListProps> = ({}) => {
   if (loading) {
     return <Spinner />;
   }
+
+  const hasPrevPage = data?.books.pageInfo.hasPreviousPage;
+  const hasNextPage = data?.books.pageInfo.hasNextPage;
+
+  const startCursor = data?.books.pageInfo.startCursor;
+  const endCursor = data?.books.pageInfo.endCursor;
+
   return (
     <>
       <Input
@@ -43,43 +50,51 @@ const BookList: React.FC<BookListProps> = ({}) => {
         {data?.books.edges.map((book) => (
           <WrapItem key={book.node.id}>
             <BookCard
-              name={book.node.name}
-              author={book.node.author}
-              cover={book.node.cover}
-              publishedDate={new Date(book.node.publishedDate)}
+              book={{
+                id: book.node.id,
+                name: book.node.name,
+                author: book.node.author,
+                publishedDate: new Date(book.node.publishedDate),
+                cover: book.node.cover,
+                copies: book.node.copies,
+              }}
             />
           </WrapItem>
         ))}
       </Wrap>
-      <Button
-        disabled={!data?.books.pageInfo.hasPreviousPage}
-        onClick={() =>
-          fetchMore({
-            variables: {
-              first: undefined,
-              last: pageLimit,
-              before: data?.books.pageInfo.startCursor,
-            },
-            updateQuery,
-          })
-        }
-      >
-        Back
-      </Button>
-      <Button
-        disabled={!data?.books.pageInfo.hasNextPage}
-        onClick={() =>
-          fetchMore({
-            variables: {
-              first: pageLimit,
-              after: data?.books.pageInfo.endCursor,
-            },
-            updateQuery,
-          })
-        }
-      >
-        Next
-      </Button>
+      {(hasPrevPage || hasNextPage) && (
+        <>
+          <Button
+            disabled={!hasPrevPage}
+            onClick={() =>
+              fetchMore({
+                variables: {
+                  first: undefined,
+                  last: pageLimit,
+                  before: startCursor,
+                },
+                updateQuery,
+              })
+            }
+          >
+            Back
+          </Button>
+          <Button
+            disabled={!data?.books.pageInfo.hasNextPage}
+            onClick={() =>
+              fetchMore({
+                variables: {
+                  first: pageLimit,
+                  after: endCursor,
+                },
+                updateQuery,
+              })
+            }
+          >
+            Next
+          </Button>
+        </>
+      )}
     </>
   );
 };

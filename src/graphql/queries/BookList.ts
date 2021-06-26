@@ -5,55 +5,18 @@ import {
   useQuery,
   useLazyQuery,
 } from "@apollo/client";
+import { Book, Paginated, Pagination } from "../../interfaces";
 import { BookFields } from "../fragments";
 
-interface Paginated<T> {
-  edges: [
-    {
-      cursor: string;
-      node: T;
-    }
-  ];
-  pageInfo: {
-    startCursor: string;
-    endCursor: string;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
+export interface BookListFilter {
+  searchTerm?: string;
+  onlyAvailable?: boolean;
 }
-
-interface Book {
-  id: number;
-  name: string;
-  isbn?: number;
-  cover?: string;
-  author: string;
-  publishedDate: Date;
-}
-
-interface Forward {
-  first?: number;
-  after?: string;
-  last?: never;
-  before?: never;
-}
-interface Backward {
-  last?: number;
-  before?: string;
-  first?: never;
-  after?: never;
-}
-
-type Pagination = Forward | Backward;
-
 interface BookListBase {
-  filter?: {
-    searchTerm?: string;
-  };
+  filter?: BookListFilter;
 }
 
 export type BookListVariables = Pagination & BookListBase;
-
 export interface BookListQuery {
   books: Paginated<Book>;
 }
@@ -77,6 +40,11 @@ export const BOOK_LIST = gql`
       edges {
         node {
           ...BookFields
+          copies {
+            id
+            rackNo
+            status
+          }
         }
       }
       pageInfo {

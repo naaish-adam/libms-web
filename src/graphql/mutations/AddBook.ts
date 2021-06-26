@@ -1,21 +1,17 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
+import { Book } from "../../interfaces";
 import { BookFields } from "../fragments";
 
-interface AddBookQuery {
-  addBook: {
-    id: number;
-    name: string;
-    isbn?: number;
-    cover?: string;
-    author: string;
-    publishedDate: Date;
-  };
+enum BookMutations {
+  ADD = "addBook",
+  UPDATE = "updateBook",
 }
+type AddBookQuery = Record<BookMutations, Book>;
 
 interface AddBookInput {
   bookInput: {
     name: string;
-    isbn?: number;
+    isbn?: string;
     cover?: string;
     author: string;
     publishedDate: number;
@@ -31,8 +27,41 @@ export const ADD_BOOK = gql`
   }
 `;
 
+export const UPDATE_BOOK = gql`
+  ${BookFields}
+  mutation UpdateBook($bookInput: BookInput!) {
+    updateBook(bookInput: $bookInput) {
+      ...BookFields
+    }
+  }
+`;
+
 export function useAddBookMutation(
   baseOptions?: MutationHookOptions<AddBookQuery, AddBookInput>
 ) {
-  return useMutation<AddBookQuery, AddBookInput>(ADD_BOOK, baseOptions);
+  return useMutation<AddBookQuery, AddBookInput>(ADD_BOOK, {
+    update(cache) {
+      cache.modify({
+        fields: {
+          books() {},
+        },
+      });
+    },
+    ...baseOptions,
+  });
+}
+
+export function useUpdateBookMutation(
+  baseOptions?: MutationHookOptions<AddBookQuery, AddBookInput>
+) {
+  return useMutation<AddBookQuery, AddBookInput>(UPDATE_BOOK, {
+    update(cache) {
+      cache.modify({
+        fields: {
+          books() {},
+        },
+      });
+    },
+    ...baseOptions,
+  });
 }

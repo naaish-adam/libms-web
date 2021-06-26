@@ -6,21 +6,20 @@ import {
   Flex,
   useColorModeValue,
   Link,
+  HStack,
 } from "@chakra-ui/react";
+import { Book, CopyStatus } from "../interfaces";
+import CheckOutBook from "./CheckOutBook";
 
 interface BookCardProps {
-  name: string;
-  author: string;
-  cover?: string;
-  publishedDate: Date;
+  book: Book;
 }
 
-const BookCard: React.FC<BookCardProps> = ({
-  name,
-  author,
-  cover,
-  publishedDate,
-}) => {
+const BookCard: React.FC<BookCardProps> = ({ book }) => {
+  const noOfCopies =
+    book.copies?.filter((copy) => copy.status === CopyStatus.AVAILABLE)
+      .length || 0;
+
   return (
     <Flex
       bg={useColorModeValue("#F9FAFB", "gray.600")}
@@ -41,7 +40,7 @@ const BookCard: React.FC<BookCardProps> = ({
           w="full"
           h={56}
           fit="cover"
-          src={cover || "https://i.mydramalist.com/wlAmnf.jpg"}
+          src={book.cover || "https://i.mydramalist.com/wlAmnf.jpg"}
           alt="avatar"
         />
 
@@ -52,25 +51,91 @@ const BookCard: React.FC<BookCardProps> = ({
             color={useColorModeValue("gray.800", "white")}
             fontWeight="bold"
           >
-            {name}
+            {book.name}
           </Link>
           <Flex mt={2} justify="space-between">
             <chakra.span
               fontSize="sm"
               color={useColorModeValue("gray.700", "gray.200")}
             >
-              {author}
+              {book.author}
             </chakra.span>
 
             <chakra.span
               fontSize="sm"
-              fontStyle="italic"
               color={useColorModeValue("gray.700", "gray.200")}
             >
-              {publishedDate.getFullYear()}
+              {book.publishedDate.getFullYear()}
             </chakra.span>
           </Flex>
         </Box>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          px={4}
+          py={2}
+          bg="gray.900"
+          roundedBottom="lg"
+        >
+          <chakra.h1 color="white" fontWeight="bold" fontSize="lg">
+            {noOfCopies} available
+          </chakra.h1>
+          {noOfCopies === 0 ? (
+            // <Tooltip
+            //   placement="top"
+            //   openDelay={500}
+            //   label="Notify when a copy becomes available"
+            //   aria-label="watch-tooltip"
+            // >
+            //   <chakra.button
+            //     px={2}
+            //     py={1}
+            //     bg="orange.500"
+            //     fontSize="xs"
+            //     fontWeight="bold"
+            //     rounded="lg"
+            //     textTransform="uppercase"
+            //     _hover={{
+            //       bg: "orange.600",
+            //     }}
+            //   >
+            //     Watch
+            //   </chakra.button>
+            // </Tooltip>
+            <chakra.button
+              px={2}
+              py={1}
+              bg="blue.500"
+              fontSize="xs"
+              fontWeight="bold"
+              rounded="lg"
+              textTransform="uppercase"
+              _hover={{
+                bg: "blue.600",
+              }}
+            >
+              Reserve
+            </chakra.button>
+          ) : (
+            <HStack>
+              <chakra.button
+                px={2}
+                py={1}
+                bg="blue.500"
+                fontSize="xs"
+                fontWeight="bold"
+                rounded="lg"
+                textTransform="uppercase"
+                _hover={{
+                  bg: "blue.600",
+                }}
+              >
+                Reserve
+              </chakra.button>
+              <CheckOutBook bookId={book.id} />
+            </HStack>
+          )}
+        </Flex>
       </Box>
     </Flex>
   );

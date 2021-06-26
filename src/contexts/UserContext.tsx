@@ -1,11 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { UserFields } from "../graphql/fragments";
-
-export enum UserRole {
-  LIBRARIAN = "LIBRARIAN",
-  MEMBER = "MEMBER",
-}
+import { UserRole } from "../interfaces";
 
 type User = { id: number; username: string; role: UserRole } | null;
 

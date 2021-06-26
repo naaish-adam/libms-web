@@ -1,5 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  Link as RouterLink,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import {
   Box,
   Spinner,
@@ -8,17 +14,24 @@ import {
   Heading,
   HStack,
   VStack,
+  Link,
   useColorModeValue,
 } from "@chakra-ui/react";
 
 import Login from "./components/Login";
-import UserContext, { UserRole } from "./contexts/UserContext";
+import UserContext from "./contexts/UserContext";
+import { UserRole } from "./interfaces";
 
 import LibrarianHome from "./routes/librarian/Home";
 import MemberHome from "./routes/member/Home";
 import { ColorModeSwitcher } from "./components/ColorModeSwitcher";
+import CheckOuts from "./routes/librarian/CheckOuts";
+import MyBooks from "./routes/member/MyBooks";
 
 export const App = () => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   const { user, loading, logout } = useContext(UserContext);
   const [site, setSite] = useState<"library" | "office" | null>(null);
 
@@ -26,10 +39,15 @@ export const App = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.role === UserRole.LIBRARIAN) {
-        setSite("office");
+      const savedSite: any = localStorage.getItem("site");
+      if (savedSite) {
+        setSite(savedSite);
       } else {
-        setSite("library");
+        if (user.role === UserRole.LIBRARIAN) {
+          setSite("office");
+        } else {
+          setSite("library");
+        }
       }
     }
   }, [user]);
@@ -63,15 +81,30 @@ export const App = () => {
     );
   }
 
+  const active = (route: string) =>
+    route === pathname
+      ? {
+          color: "blue.400",
+          fontWeight: "bold",
+        }
+      : {};
+
   return (
-    <BrowserRouter>
+    <>
       {site === "office" ? (
         <>
           <Box bg={navBg} py={2} boxShadow="md">
             <Flex align="center" justify="space-between" w="70%" mx="auto">
               <Heading fontSize="3xl">LIBMS</Heading>
               <HStack>
-                <Button size="sm" onClick={() => setSite("library")}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setSite("library");
+                    localStorage.setItem("site", "library");
+                    navigate("/", { replace: true });
+                  }}
+                >
                   Switch to library
                 </Button>
                 <ColorModeSwitcher />
@@ -86,8 +119,17 @@ export const App = () => {
             </Flex>
           </Box>
           <Box w="70%" mx="auto" py="40px">
+            <HStack spacing={4} mb={8}>
+              <Link {...active("/")} colorScheme="red" as={RouterLink} to="/">
+                Home
+              </Link>
+              <Link {...active("/check-outs")} as={RouterLink} to="/check-outs">
+                Check Outs
+              </Link>
+            </HStack>
             <Routes>
               <Route path="/" element={<LibrarianHome />} />
+              <Route path="check-outs" element={<CheckOuts />} />
             </Routes>
           </Box>
         </>
@@ -95,10 +137,23 @@ export const App = () => {
         <>
           <Box bg={navBg} py={2} boxShadow="md">
             <Flex align="center" justify="space-between" w="70%" mx="auto">
-              <Heading fontSize="3xl">LIBMS</Heading>
+              <Heading
+                cursor="pointer"
+                onClick={() => navigate("/")}
+                fontSize="3xl"
+              >
+                LIBMS
+              </Heading>
               <HStack>
                 {user.role === UserRole.LIBRARIAN && (
-                  <Button size="sm" onClick={() => setSite("office")}>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSite("office");
+                      localStorage.setItem("site", "office");
+                      navigate("/", { replace: true });
+                    }}
+                  >
                     Switch to office
                   </Button>
                 )}
@@ -114,12 +169,21 @@ export const App = () => {
             </Flex>
           </Box>
           <Box w="70%" mx="auto" py="40px">
+            <HStack spacing={4} mb={8}>
+              <Link {...active("/")} as={RouterLink} to="/">
+                Home
+              </Link>
+              <Link {...active("/my-books")} as={RouterLink} to="/my-books">
+                My Books
+              </Link>
+            </HStack>
             <Routes>
               <Route path="/" element={<MemberHome />} />
+              <Route path="/my-books" element={<MyBooks />} />
             </Routes>
           </Box>
         </>
       )}
-    </BrowserRouter>
+    </>
   );
 };

@@ -1,3 +1,4 @@
+import { BrowserRouter } from "react-router-dom";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { ColorModeScript, ChakraProvider, theme } from "@chakra-ui/react";
 import * as React from "react";
@@ -9,7 +10,21 @@ import * as serviceWorker from "./serviceWorker";
 
 const client = new ApolloClient({
   uri: "http://localhost:4000",
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          // books: {
+          //   merge: false,
+          //   read(existing) {
+          //     console.log(existing);
+          //     return existing;
+          //   },
+          // },
+        },
+      },
+    },
+  }),
 });
 
 ReactDOM.render(
@@ -18,7 +33,9 @@ ReactDOM.render(
     <ChakraProvider theme={theme}>
       <ApolloProvider client={client}>
         <UserProvider>
-          <App />
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
         </UserProvider>
       </ApolloProvider>
     </ChakraProvider>

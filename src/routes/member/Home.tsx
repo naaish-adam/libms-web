@@ -8,10 +8,8 @@ interface HomeProps {}
 const Home: React.FC<HomeProps> = ({}) => {
   return (
     <Box>
-      <Flex mb={8} justify="space-between" align="center">
-        <Heading>Member's Books</Heading>
-        <AddBook />
-      </Flex>
+      <Heading mb={8}>Books</Heading>
+
       <BookList />
     </Box>
   );

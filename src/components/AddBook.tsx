@@ -14,74 +14,110 @@ import {
   ModalOverlay,
   useDisclosure,
   useToast,
+  ButtonGroup,
+  ButtonProps,
 } from "@chakra-ui/react";
 import { Field, FieldProps, Form, Formik } from "formik";
-import { useAddBookMutation } from "../graphql/mutations/AddBook";
+import {
+  useAddBookMutation,
+  useUpdateBookMutation,
+} from "../graphql/mutations/AddBook";
 import to from "await-to-js";
+import { Book } from "../interfaces";
 
-const AddBook: React.FC = () => {
+interface AddBookProps {
+  book?: Book;
+  buttonProps?: ButtonProps;
+}
+
+const AddBook: React.FC<AddBookProps> = ({ book, buttonProps }) => {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [addBook] = useAddBookMutation();
+  const [updateBook] = useUpdateBookMutation();
 
-  const required = (value: any, label: string) => {
+  const required = (
+    value: any,
+    fieldName: string,
+    required: boolean = true
+  ) => {
     let error;
-    if (!value) {
-      error = `${label} is required!`;
+    if (required && !value) {
+      error = `${fieldName} is required.`;
     }
     return error;
   };
 
+  const initialValues = book
+    ? {
+        ...book,
+        publishedDate: new Date(book.publishedDate).toJSON().slice(0, 7),
+      }
+    : {
+        name: "",
+        isbn: "",
+        cover: "",
+        author: "",
+        publishedDate: new Date().toJSON().slice(0, 7),
+      };
+
   return (
     <>
-      <Button size="sm" onClick={onOpen}>
-        Add Book
+      <Button onClick={onOpen} {...buttonProps}>
+        {buttonProps?.title || "Add Book"}
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add Book</ModalHeader>
+          <ModalHeader>{book ? "Edit" : "Add"} Book</ModalHeader>
           <ModalCloseButton />
           <Formik
-            initialValues={{
-              name: "",
-              isbn: "",
-              cover: "",
-              author: "",
-              publishedDate: new Date(),
-            }}
-            onSubmit={async (values, { setSubmitting, resetForm }) => {
+            initialValues={initialValues}
+            onSubmit={async (values, { setSubmitting }) => {
               const [error, result] = await to(
-                addBook({
-                  variables: {
-                    bookInput: {
-                      ...values,
-                      isbn: +values.isbn,
-                      publishedDate: new Date(values.publishedDate).getTime(),
-                    },
-                  },
-                })
+                book
+                  ? updateBook({
+                      variables: {
+                        bookInput: {
+                          ...values,
+                          publishedDate: new Date(
+                            values.publishedDate
+                          ).getTime(),
+                        },
+                      },
+                    })
+                  : addBook({
+                      variables: {
+                        bookInput: {
+                          ...values,
+                          publishedDate: new Date(
+                            values.publishedDate
+                          ).getTime(),
+                        },
+                      },
+                    })
               );
 
               if (error) {
-                setSubmitting(false);
                 toast({
                   title: "An error occurred.",
                   status: "error",
                   duration: 5000,
                   isClosable: true,
                 });
-                return;
+                setSubmitting(false);
+              } else {
+                toast({
+                  title: `Book "${
+                    result?.data?.[book ? "updateBook" : "addBook"].name
+                  }" ${book ? "updated" : "added"}!`,
+                  status: "success",
+                  duration: 5000,
+                  isClosable: true,
+                });
+                onClose();
               }
-
-              resetForm();
-              toast({
-                title: `Book "${result?.data?.addBook.name}" added!`,
-                status: "success",
-                duration: 5000,
-                isClosable: true,
-              });
             }}
           >
             {({ isSubmitting }) => (
@@ -89,7 +125,7 @@ const AddBook: React.FC = () => {
                 <ModalBody pb={6}>
                   <Field
                     name="name"
-                    validate={(value: string) => required(value, "Book Name")}
+                    validate={(value: string) => required(value, "Book name")}
                   >
                     {({ form, field }: FieldProps) => (
                       <FormControl
@@ -104,7 +140,10 @@ const AddBook: React.FC = () => {
                     )}
                   </Field>
 
-                  <Field name="isbn">
+                  <Field
+                    name="isbn"
+                    validate={(value: string) => required(value, "ISBN")}
+                  >
                     {({ form, field }: FieldProps) => (
                       <FormControl
                         mt={4}
@@ -115,8 +154,8 @@ const AddBook: React.FC = () => {
                         <FormLabel htmlFor="isbn">ISBN</FormLabel>
                         <Input
                           {...field}
-                          type="number"
                           id="isbn"
+                          maxLength={13}
                           placeholder="ISBN"
                         />
                         <FormErrorMessage>{form.errors.isbn}</FormErrorMessage>
@@ -139,7 +178,10 @@ const AddBook: React.FC = () => {
                     )}
                   </Field>
 
-                  <Field name="author">
+                  <Field
+                    name="author"
+                    validate={(value: string) => required(value, "Author")}
+                  >
                     {({ form, field }: FieldProps) => (
                       <FormControl
                         mt={4}
@@ -156,7 +198,12 @@ const AddBook: React.FC = () => {
                     )}
                   </Field>
 
-                  <Field name="publishedDate">
+                  <Field
+                    name="publishedDate"
+                    validate={(value: string) =>
+                      required(value, "Published date")
+                    }
+                  >
                     {({ form, field }: FieldProps) => (
                       <FormControl
                         mt={4}
@@ -170,7 +217,7 @@ const AddBook: React.FC = () => {
                         </FormLabel>
                         <Input
                           {...field}
-                          type="date"
+                          type="month"
                           id="publishedDate"
                           placeholder="published date"
                         />
@@ -185,15 +232,16 @@ const AddBook: React.FC = () => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button
-                    isLoading={isSubmitting}
-                    type="submit"
-                    colorScheme="blue"
-                    mr={3}
-                  >
-                    Add
-                  </Button>
-                  <Button onClick={onClose}>Cancel</Button>
+                  <ButtonGroup spacing={2}>
+                    <Button
+                      isLoading={isSubmitting}
+                      type="submit"
+                      colorScheme="blue"
+                    >
+                      {book ? "Save" : "Add"}
+                    </Button>
+                    <Button onClick={onClose}>Cancel</Button>
+                  </ButtonGroup>
                 </ModalFooter>
               </Form>
             )}
