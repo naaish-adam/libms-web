@@ -5,7 +5,7 @@ import BookCard from "./BookCard";
 
 interface BookListProps {}
 
-const BookList: React.FC<BookListProps> = ({}) => {
+const BookList: React.FC<BookListProps> = () => {
   const pageLimit = 10;
   const [filter, setFilter] = useState<string | undefined>(undefined);
   const { data, loading, fetchMore, refetch } = useBookListQuery({
