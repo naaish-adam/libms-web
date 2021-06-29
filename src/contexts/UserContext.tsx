@@ -59,7 +59,10 @@ export const UserProvider: React.FC = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
   };
-  const saveUser = (u: User) => setUser(u);
+  const saveUser = (u: User) => {
+    localStorage.setItem("token", `${u!.id}`);
+    setUser(u);
+  };
 
   return (
     <UserContext.Provider value={{ user, loading, saveUser, logout }}>

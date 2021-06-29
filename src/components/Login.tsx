@@ -52,7 +52,6 @@ const Login: React.FC<LoginProps> = () => {
         if (data.login.error) {
           actions.setErrors({ username: data.login.error });
         } else {
-          localStorage.setItem("token", "hello");
           saveUser(data.login.user);
         }
 
