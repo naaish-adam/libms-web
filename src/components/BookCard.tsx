@@ -6,7 +6,6 @@ import {
   Flex,
   useColorModeValue,
   Link,
-  HStack,
 } from "@chakra-ui/react";
 import { Book, CopyStatus } from "../interfaces";
 import CheckOutBook from "./CheckOutBook";
@@ -16,6 +15,8 @@ interface BookCardProps {
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
+  // are there any copies ?  is any copy available ? checkout : reserve : none
+  const anyCopies = book.copies && book.copies.length > 0;
   const noOfCopies =
     book.copies?.filter((copy) => copy.status === CopyStatus.AVAILABLE)
       .length || 0;
@@ -80,44 +81,8 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           <chakra.h1 color="white" fontWeight="bold" fontSize="lg">
             {noOfCopies} available
           </chakra.h1>
-          {noOfCopies === 0 ? (
-            // <Tooltip
-            //   placement="top"
-            //   openDelay={500}
-            //   label="Notify when a copy becomes available"
-            //   aria-label="watch-tooltip"
-            // >
-            //   <chakra.button
-            //     px={2}
-            //     py={1}
-            //     bg="orange.500"
-            //     fontSize="xs"
-            //     fontWeight="bold"
-            //     rounded="lg"
-            //     textTransform="uppercase"
-            //     _hover={{
-            //       bg: "orange.600",
-            //     }}
-            //   >
-            //     Watch
-            //   </chakra.button>
-            // </Tooltip>
-            <chakra.button
-              px={2}
-              py={1}
-              bg="blue.500"
-              fontSize="xs"
-              fontWeight="bold"
-              rounded="lg"
-              textTransform="uppercase"
-              _hover={{
-                bg: "blue.600",
-              }}
-            >
-              Reserve
-            </chakra.button>
-          ) : (
-            <HStack>
+          {anyCopies &&
+            (noOfCopies === 0 ? (
               <chakra.button
                 px={2}
                 py={1}
@@ -132,9 +97,9 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
               >
                 Reserve
               </chakra.button>
+            ) : (
               <CheckOutBook bookId={book.id} />
-            </HStack>
-          )}
+            ))}
         </Flex>
       </Box>
     </Flex>
