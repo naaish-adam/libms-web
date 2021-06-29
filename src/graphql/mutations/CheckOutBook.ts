@@ -31,10 +31,17 @@ export const CHECK_OUT_BOOK = gql`
 export function useCheckOutBookMutation(
   baseOptions?: MutationHookOptions<CheckOutBookQuery, CheckOutBookInput>
 ) {
-  return useMutation<CheckOutBookQuery, CheckOutBookInput>(
-    CHECK_OUT_BOOK,
-    baseOptions
-  );
+  return useMutation<CheckOutBookQuery, CheckOutBookInput>(CHECK_OUT_BOOK, {
+    update(cache) {
+      cache.modify({
+        fields: {
+          checkOuts() {},
+          books() {},
+        },
+      });
+    },
+    ...baseOptions,
+  });
 }
 
 interface ReturnBookQuery {
@@ -54,8 +61,15 @@ export const RETURN_BOOK = gql`
 export function useReturnBookMutation(
   baseOptions?: MutationHookOptions<ReturnBookQuery, ReturnBookInput>
 ) {
-  return useMutation<ReturnBookQuery, ReturnBookInput>(
-    RETURN_BOOK,
-    baseOptions
-  );
+  return useMutation<ReturnBookQuery, ReturnBookInput>(RETURN_BOOK, {
+    update(cache) {
+      cache.modify({
+        fields: {
+          checkOuts() {},
+          books() {},
+        },
+      });
+    },
+    ...baseOptions,
+  });
 }

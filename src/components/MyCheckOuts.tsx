@@ -11,21 +11,36 @@ import {
   Divider,
   Text,
   Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import { useCheckOutsQuery } from "../graphql/queries/CheckOuts";
+import { useReturnBookMutation } from "../graphql/mutations/CheckOutBook";
 import BookCover from "./BookCover";
+import { useState } from "react";
 
 interface Props {
   userId: number;
 }
 
 const MyCheckOuts: React.FC<Props> = ({ userId }) => {
+  const [returningId, setReturningId] = useState<number | null>(null);
+
+  const toast = useToast();
   const { data, loading } = useCheckOutsQuery({
     variables: { first: 10, filter: { returned: false, userId } },
   });
+  const [returnBook, { loading: returning }] = useReturnBookMutation();
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner ml="50%" pt={5} />;
+  }
+
+  if ((data?.checkOuts.edges.length as number) === 0) {
+    return (
+      <Text pt={5} textAlign="center" fontSize="lg" fontWeight="bold">
+        nothing here 🥺
+      </Text>
+    );
   }
 
   return (
@@ -48,7 +63,24 @@ const MyCheckOuts: React.FC<Props> = ({ userId }) => {
                 </Box>
               </HStack>
               <VStack align="flex-end">
-                <Button variant="ghost" size="xs" colorScheme="orange">
+                <Button
+                  onClick={async () => {
+                    setReturningId(co.node.id);
+                    await returnBook({
+                      variables: { id: co.node.id },
+                    });
+                    toast({
+                      title: "Successfully returned book!",
+                      status: "success",
+                      duration: 5000,
+                      isClosable: true,
+                    });
+                  }}
+                  isLoading={returning && returningId === co.node.id}
+                  variant="ghost"
+                  size="xs"
+                  colorScheme="orange"
+                >
                   return
                 </Button>
                 <Text color="gray.400" fontSize="xs" fontStyle="italic">
