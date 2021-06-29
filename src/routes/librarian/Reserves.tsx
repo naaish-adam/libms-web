@@ -4,13 +4,13 @@ import AddBook from "../../components/AddBook";
 import ReserveTable from "../../components/ReserveTable";
 import {
   useReservesLazyQuery,
-  //ReservesFilter,
-} from "../../graphql/queries/Reserves";
+  ReservesFilter,
+} from "../../graphql/queries/Reserves";  
 
 const Reserves: React.FC = () => {
   const pageLimit = 10;
   const inputRef = useRef<HTMLInputElement>(null);
-  const [filter, setFilter] = useState({});
+  const [filter] = useState<ReservesFilter>({ active: true });
 
   const [reserves, { data, loading }] = useReservesLazyQuery();
 
@@ -18,7 +18,7 @@ const Reserves: React.FC = () => {
     reserves({
       variables: {
         first: pageLimit,
-        //filter,
+        filter,
       },
     });
   }, [reserves, filter]);
@@ -31,7 +31,7 @@ const Reserves: React.FC = () => {
       variables: {
         first: pageLimit,
         after: endCursor,
-        // filter,
+        filter,
       },
     });
   };
@@ -41,7 +41,7 @@ const Reserves: React.FC = () => {
       variables: {
         last: pageLimit,
         before: startCursor,
-        //filter,
+        filter,
       },
     });
   };

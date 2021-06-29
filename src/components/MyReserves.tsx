@@ -23,7 +23,15 @@ const MyReserves: React.FC<Props> = ({ userId }) => {
   });
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner ml="50%" pt={5} />;
+  }
+
+  if ((data?.reserves.edges.length as number) === 0) {
+    return (
+      <Text pt={5} textAlign="center" fontSize="lg" fontWeight="bold">
+        nothing here 🥺
+      </Text>
+    );
   }
 
   return (

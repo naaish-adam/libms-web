@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { Book, CopyStatus } from "../interfaces";
 import CheckOutBook from "./CheckOutBook";
+import ReserveBook from "./ReserveBook";
 
 interface BookCardProps {
   book: Book;
@@ -83,20 +84,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           </chakra.h1>
           {anyCopies &&
             (noOfCopies === 0 ? (
-              <chakra.button
-                px={2}
-                py={1}
-                bg="blue.500"
-                fontSize="xs"
-                fontWeight="bold"
-                rounded="lg"
-                textTransform="uppercase"
-                _hover={{
-                  bg: "blue.600",
-                }}
-              >
-                Reserve
-              </chakra.button>
+              <ReserveBook bookId={book.id} />
             ) : (
               <CheckOutBook bookId={book.id} />
             ))}
