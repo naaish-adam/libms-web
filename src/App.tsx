@@ -27,6 +27,7 @@ import MemberHome from "./routes/member/Home";
 import { ColorModeSwitcher } from "./components/ColorModeSwitcher";
 import CheckOuts from "./routes/librarian/CheckOuts";
 import MyBooks from "./routes/member/MyBooks";
+import Reserves from "./routes/librarian/Reserves";
 
 export const App = () => {
   const navigate = useNavigate();
@@ -126,10 +127,14 @@ export const App = () => {
               <Link {...active("/check-outs")} as={RouterLink} to="/check-outs">
                 Check Outs
               </Link>
+              <Link {...active("/reserves")} as={RouterLink} to="/reserves">
+                Reserves
+              </Link>
             </HStack>
             <Routes>
               <Route path="/" element={<LibrarianHome />} />
               <Route path="check-outs" element={<CheckOuts />} />
+              <Route path="reserves" element={<Reserves />} />
             </Routes>
           </Box>
         </>
