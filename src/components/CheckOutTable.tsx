@@ -56,8 +56,8 @@ const CheckOutTable: React.FC<CheckOutProps> = ({ returned }) => {
         <Tbody>
           {data?.checkOuts.edges.map((checkOut) => (
             <Tr key={checkOut.node.id}>
-              <Td>{checkOut.node.copy.book?.name}</Td>
-              <Td fontWeight="semibold">{checkOut.node.borrower.username}</Td>
+              <Td fontWeight="semibold">{checkOut.node.copy.book?.name}</Td>
+              <Td>{checkOut.node.borrower.username}</Td>
               <Td>{new Date(checkOut.node.dueAt).toDateString()}</Td>
               <Td>
                 {returned ? (

@@ -13,6 +13,7 @@ interface CheckOutsBase {
   filter: {
     returned: boolean;
     searchTerm?: string;
+    userId?: number;
   };
 }
 
@@ -51,6 +52,7 @@ export const CHECK_OUTS = gql`
             }
           }
           dueAt
+          createdAt
           updatedAt
         }
       }
