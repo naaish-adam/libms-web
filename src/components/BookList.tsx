@@ -38,8 +38,8 @@ const BookList: React.FC<BookListProps> = () => {
     <>
       <Input
         mb={8}
-        placeholder="Search books by title, author or ISBN"
-        onChange={({ target }) => setFilter(target.value)}
+        placeholder="Search books by ISBN, title, author, category or publication year"
+        onChange={({ target }) => setFilter(target.value.trim())}
         onKeyDown={({ key }) =>
           key === "Enter"
             ? refetch({ first: pageLimit, filter: { searchTerm: filter } })
@@ -57,6 +57,7 @@ const BookList: React.FC<BookListProps> = () => {
                 publishedDate: new Date(book.node.publishedDate),
                 cover: book.node.cover,
                 copies: book.node.copies,
+                category: book.node.category,
               }}
             />
           </WrapItem>

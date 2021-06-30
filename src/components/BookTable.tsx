@@ -34,7 +34,15 @@ const BookTable: React.FC<BookTableProps> = ({ data, loading, next, back }) => {
   const [deleteBook, { loading: deleting }] = useDeleteBookMutation();
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner ml="50%" pt={5} />;
+  }
+
+  if ((data?.books.edges.length as number) === 0) {
+    return (
+      <Text pt={5} textAlign="center" fontSize="lg" fontWeight="bold">
+        such empty 🥺
+      </Text>
+    );
   }
 
   const hasPrevPage = data?.books.pageInfo.hasPreviousPage;
@@ -104,6 +112,8 @@ const BookTable: React.FC<BookTableProps> = ({ data, loading, next, back }) => {
                       author: book.node.author,
                       publishedDate: new Date(book.node.publishedDate),
                       cover: book.node.cover,
+                      isbn: book.node.isbn,
+                      category: book.node.category,
                     }}
                     buttonProps={{ title: "Edit", colorScheme: "blue" }}
                   />
