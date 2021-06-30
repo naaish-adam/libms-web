@@ -59,6 +59,7 @@ const AddBook: React.FC<AddBookProps> = ({ book, buttonProps }) => {
         isbn: "",
         cover: "",
         author: "",
+        category: "",
         publishedDate: new Date().toJSON().slice(0, 7),
       };
 
@@ -141,6 +142,50 @@ const AddBook: React.FC<AddBookProps> = ({ book, buttonProps }) => {
                   </Field>
 
                   <Field
+                    name="author"
+                    validate={(value: string) => required(value, "Author")}
+                  >
+                    {({ form, field }: FieldProps) => (
+                      <FormControl
+                        mt={4}
+                        isInvalid={Boolean(
+                          form.errors.author && form.touched.author
+                        )}
+                      >
+                        <FormLabel htmlFor="author">Author</FormLabel>
+                        <Input {...field} id="author" placeholder="author" />
+                        <FormErrorMessage>
+                          {form.errors.author}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+
+                  <Field
+                    name="category"
+                    validate={(value: string) => required(value, "Category")}
+                  >
+                    {({ form, field }: FieldProps) => (
+                      <FormControl
+                        mt={4}
+                        isInvalid={Boolean(
+                          form.errors.category && form.touched.category
+                        )}
+                      >
+                        <FormLabel htmlFor="category">Category</FormLabel>
+                        <Input
+                          {...field}
+                          id="category"
+                          placeholder="category"
+                        />
+                        <FormErrorMessage>
+                          {form.errors.category}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+
+                  <Field
                     name="isbn"
                     validate={(value: string) => required(value, "ISBN")}
                   >
@@ -174,26 +219,6 @@ const AddBook: React.FC<AddBookProps> = ({ book, buttonProps }) => {
                         <FormLabel htmlFor="cover">Cover</FormLabel>
                         <Input {...field} id="cover" placeholder="cover" />
                         <FormErrorMessage>{form.errors.cover}</FormErrorMessage>
-                      </FormControl>
-                    )}
-                  </Field>
-
-                  <Field
-                    name="author"
-                    validate={(value: string) => required(value, "Author")}
-                  >
-                    {({ form, field }: FieldProps) => (
-                      <FormControl
-                        mt={4}
-                        isInvalid={Boolean(
-                          form.errors.author && form.touched.author
-                        )}
-                      >
-                        <FormLabel htmlFor="author">Author</FormLabel>
-                        <Input {...field} id="author" placeholder="author" />
-                        <FormErrorMessage>
-                          {form.errors.author}
-                        </FormErrorMessage>
                       </FormControl>
                     )}
                   </Field>
