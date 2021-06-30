@@ -7,6 +7,7 @@ const BookFields = gql`
     name
     cover
     author
+    category
     publishedDate
     createdAt
     updatedAt

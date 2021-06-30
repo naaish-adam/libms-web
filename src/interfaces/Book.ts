@@ -6,6 +6,7 @@ export default interface Book extends Common {
   author: string;
   isbn?: string;
   cover?: string;
+  category: string;
   publishedDate: Date;
   copies?: Copy[];
 }

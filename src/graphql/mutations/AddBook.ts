@@ -13,6 +13,7 @@ interface AddBookInput {
     name: string;
     isbn?: string;
     cover?: string;
+    category: string;
     author: string;
     publishedDate: number;
   };
